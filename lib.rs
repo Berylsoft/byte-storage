@@ -13,7 +13,9 @@ pub use bytes::{self, Bytes};
 mod marker;
 pub use marker::*;
 
+#[cfg(feature = "str")]
 mod bytestr;
+#[cfg(feature = "str")]
 pub use bytestr::*;
 
 mod input;
