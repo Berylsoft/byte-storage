@@ -133,11 +133,11 @@ impl<B: AsRef<[u8]>, I: Input<Storage = B>> Reader<I> {
         self.input.len() - self.pos
     }
 
-    pub fn split_out(&mut self, size: usize) -> Result<I> {
-        let new_pos = self.pos.checked_add(size)
-            .ok_or(ReadError::TooLongReadLen(size))?;
+    pub fn split_out(&mut self, len: usize) -> Result<I> {
+        let new_pos = self.pos.checked_add(len)
+            .ok_or(ReadError::TooLongReadLen(len))?;
         let ret = self.input.bytes(self.pos..new_pos)
-            .ok_or(ReadError::TooShort { rest: self.rest_len(), expected: size })?;
+            .ok_or(ReadError::TooShort { rest: self.rest_len(), expected: len })?;
         self.pos = new_pos;
         Ok(ret)
     }
@@ -194,8 +194,8 @@ impl<B: AsRef<[u8]>, I: Input<Storage = B>> Reader<I> {
     }
 
     #[inline]
-    pub fn bytes(&mut self, sz: usize) -> Result<B> {
-        Ok(self.split_out(sz)?.leak())
+    pub fn bytes(&mut self, len: usize) -> Result<B> {
+        Ok(self.split_out(len)?.leak())
     }
 
     // copies
