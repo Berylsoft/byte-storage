@@ -8,6 +8,7 @@ pub trait Output: Default {
     fn byte(&mut self, n: u8);
     fn bytes<B: AsRef<[u8]>>(&mut self, bytes: B);
     fn leak(self) -> Self::Storage;
+    fn leak_next_mut(&mut self, len: usize) -> &mut [u8];
 }
 
 #[cfg(feature = "alloc")]
@@ -32,5 +33,13 @@ impl Output for VecOutput {
 
     fn leak(self) -> Self::Storage {
         self.bytes
+    }
+
+    fn leak_next_mut(&mut self, len: usize) -> &mut [u8] {
+        let curr_len = self.bytes.len();
+        // TODO unsafe set_len?
+        // but `&mut [u8]` is not `&mut [MaybeUninit<u8>]`, that should be illegal
+        self.bytes.resize(curr_len + len, 0);
+        &mut self.bytes[curr_len..]
     }
 }
